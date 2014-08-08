@@ -22,12 +22,12 @@ public class MedianFileGenerator {
 		
 		
 		createSmallFiles();
-		createBigFile(6250000, 50000000, new ArrayList<>(3250000));
-		createBigFile(6250021, 50000000, new ArrayList<>(3250021));
-		createBigFile(6250122, 50000000, new ArrayList<>(3250122));
-		createBigFile(6250012, 50000000, new ArrayList<>(3250012));
-		createBigFile(6248012, 50000000, new ArrayList<>(3248012));
-		createBigFile(6248111, 50000000, new ArrayList<>(3248111));
+		createBigFile(6250000, 50000000, new ArrayList<>(6250000));
+		createBigFile(6250021, 50000000, new ArrayList<>(6250021));
+		createBigFile(6250122, 50000000, new ArrayList<>(6250122));
+		createBigFile(6250012, 50000000, new ArrayList<>(6250012));
+		createBigFile(6248012, 50000000, new ArrayList<>(6248012));
+		createBigFile(6248111, 50000000, new ArrayList<>(6248111));
 		
 		try {
 			checkFileValidity(PATH);
