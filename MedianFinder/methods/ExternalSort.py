@@ -5,6 +5,7 @@ Created on 03 Aug 2014
 '''
 from math import ceil
 from MedianFinder.util import FileUtil
+import heapq
 
 class MergeSort(object):
     """
@@ -50,7 +51,7 @@ class MergeSort(object):
     
     def _merge_chunks(self, open_files, output_file):
         """This method will merge all open_files, which are already sorted, into one sorted file and returns the new fileName
-        
+            This method is useless with the introduction of _merge_chunks_with_heap
             Args :
                 open_files : The files that have been opened to be merged
                 output_file : the file that has been opened and into which merged values will be written
@@ -75,12 +76,34 @@ class MergeSort(object):
         [FileUtil.remove_file(file__) for file__ in open_files]
         output_file.close()
         return output_file.name
+    
+    def _merge_chunks_with_heap(self, open_files, output_file):
+        "This method will work like _merge_chunks_with_heap, except that it will use a heap instead of an array"
+        
+        heap = []
+        for index, file in enumerate(open_files) :
+            heap.append((int(file.readline()), index, file))
+        heapq.heapify(heap)
+        min_info = heapq.heappop(heap)
+        while min_info :
+            output_file.write(str(min_info[0]) + "\n")
+            temp_file = min_info[2]
+            line = temp_file.readline()
+            if line :
+                heapq.heappush(heap, (int(line), min_info[1], temp_file))
+            if heap :
+                min_info = heapq.heappop(heap)
+            else :
+                break
+        [FileUtil.remove_file(file__) for file__ in open_files]
+        output_file.close()
+        return output_file.name
         
     def _merge_sorted_files(self, output_list, file_name):
         "This method will merge already sorted files to one sorted file when the amount of them exceeds the THRESHOLD."
         temp_file_list = []
         [temp_file_list.append(open(file__, "r")) for file__ in output_list]
-        output_list = [self._merge_chunks(temp_file_list, open(file_name + FileUtil.TXT_SUFFIX, "w"))]
+        output_list = [self._merge_chunks_with_heap(temp_file_list, open(file_name + FileUtil.TXT_SUFFIX, "w"))]
         del temp_file_list
         return output_list
         
@@ -94,7 +117,7 @@ class MergeSort(object):
         number_of_files = ceil(total_lines/self.THRESHOLD)
         if number_of_files <= self.THRESHOLD :
             [open_files.append(open(str(file_index_) + FileUtil.TXT_SUFFIX, "r")) for file_index_ in range(0, number_of_files)]
-            return self._merge_chunks(open_files, open(self.__MERGE_LABEL + FileUtil.TXT_SUFFIX, "w"))
+            return self._merge_chunks_with_heap(open_files, open(self.__MERGE_LABEL + FileUtil.TXT_SUFFIX, "w"))
         else :
             output_file_list = []
             processed_file_counter = 0
@@ -104,17 +127,17 @@ class MergeSort(object):
                 open_files.append(open(str(file_index_) + FileUtil.TXT_SUFFIX, "r"))
                 processed_file_counter += 1
                 if processed_file_counter % self.THRESHOLD == 0 :
-                    output_file_list.append(self._merge_chunks(open_files, open(self.__MERGE_LABEL + str(merge_counter) + FileUtil.TXT_SUFFIX, "w")))
+                    output_file_list.append(self._merge_chunks_with_heap(open_files, open(self.__MERGE_LABEL + str(merge_counter) + FileUtil.TXT_SUFFIX, "w")))
                     merge_counter += 1
                     if merge_counter % self.THRESHOLD == 0 :
                         output_file_list = self._merge_sorted_files(output_file_list, self.__MERGE_LABEL * 2 + str(merge_of_merges_counter))
                         merge_of_merges_counter += 1
                     open_files = []
             if len(open_files) > 0 :
-                output_file_list.append(self._merge_chunks(open_files, open(self.__MERGE_LABEL + str(merge_counter) + FileUtil.TXT_SUFFIX, "w")))
+                output_file_list.append(self._merge_chunks_with_heap(open_files, open(self.__MERGE_LABEL + str(merge_counter) + FileUtil.TXT_SUFFIX, "w")))
             open_files = []
             [open_files.append(open(file, "r")) for file in output_file_list]
-            return self._merge_chunks(open_files, open(self.__MERGE_LABEL + FileUtil.TXT_SUFFIX, "w"))
+            return self._merge_chunks_with_heap(open_files, open(self.__MERGE_LABEL + FileUtil.TXT_SUFFIX, "w"))
         
     def calculate_median(self, file_name):
         total_lines = self._write_to_temp_files(file_name)
@@ -133,7 +156,9 @@ class MergeSort(object):
                 return medianValue
 
     def _get_min_of_list(self, input_list):
-        "This method will return the minimum number of the input_list along with its index in the list. It will skip 'None' values"
+        """This method will return the minimum number of the input_list along with its index in the list. It will skip 'None' values
+            This method is not needed with the _merge_chunks_with_heap function
+        """
         index_of_min = 0
         valid_values = False
         first_min_set = False
