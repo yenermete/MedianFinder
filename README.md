@@ -6,6 +6,6 @@ or external sorting to find the median value. External sorting has the limit of 
 Naturally, quick select is not affected from this constraint.
 
 There is also a java source file which generates files that can be used to test the correctness of the program.
-This java source creates files with the following naming format : "line_count_median_value.txt". All files can be given to
+This java source creates files with the following naming format : "lineCount_medianValue.txt". All files can be given to
 the TestAllFiles.py script to be checked with both methods, or either unit tests or main module can be run to check the
 correctness.
